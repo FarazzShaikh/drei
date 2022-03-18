@@ -66,6 +66,7 @@ The `native` route of the library **does not** export `Html` or `Loader`. The de
           <li><a href="#gradienttexture">GradientTexture</a></li>
           <li><a href="#edges">Edges</a></li>
           <li><a href="#trail">Trail</a></li>
+          <li><a href="#clone">Clone</a></li>
           <li><a href="#useanimations">useAnimations</a></li>
         </ul>
         <li><a href="#shaders">Shaders</a></li>
@@ -657,6 +658,9 @@ Props defined bellow with their default values.
   color={'hotpink'} // Color of the line
   length={1} // Length of the line
   decay={1} // How fast the line fades away
+  local={false} // Wether to use the target's world or local positions
+  stride={0} // Min distance between previous and current point
+  interval={1} // Number of frames to wait before next calculation
   target={undefined} // Optional target. This object will produce the trail.
   attenuation={(width) => width} // A function to define the width in each point along it.
 >
@@ -672,6 +676,36 @@ Props defined bellow with their default values.
 ```
 
 👉 Inspired by [TheSpite's Codevember 2021 #9](https://spite.github.io/codevember-2021/9/)
+
+# <<<<<<< HEAD
+
+#### Clone
+
+Declarative abstraction around THREE.Object3D.clone. This is useful when you want to create a shallow copy of an existing fragment (and Object3D, Groups, etc) into your scene, for instance a group from a loaded GLTF. This clone is now re-usable, but it will still refer to the original geometries and materials. You can also deeply clone, down to geometries and materials using the `deep` prop.
+
+```jsx
+<Clone object={nodes.table} />
+```
+
+You can dynamically insert objects, these will apply to anything that isn't a group or a plain object3d (meshes, lines, etc):
+
+```jsx
+const { nodes } = useGLTF(url)
+return (
+  <Clone object={nodes.table}>
+    <meshStandardMaterial color="green" />
+  </Clone>
+```
+
+Or make inserts conditional:
+
+```jsx
+<Clone object={nodes.table}>
+  {(object) => (object.name === 'table' ? <meshStandardMaterial color="green" /> : null)}
+</Clone>
+```
+
+> > > > > > > upstream/master
 
 #### useAnimations
 
@@ -1180,8 +1214,13 @@ Note: The hook returns a ref (`MutableRefObject<Vector3[]>`) this means updates 
 ```js
 const points = useTrail(
   target, // Required target object. This object will produce the trail.
-  length, // Length of the line
-  decay // How fast the line fades away
+  {
+    length, // Length of the line
+    decay, // How fast the line fades away
+    local, // Wether to use the target's world or local positions
+    stride, // Min distance between previous and current point
+    interval, // Number of frames to wait before next calculation
+  }
 )
 
 // To use...
