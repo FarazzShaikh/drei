@@ -2,9 +2,11 @@
 export * from './Billboard'
 export * from './QuadraticBezierLine'
 export * from './CubicBezierLine'
+export * from './CatmullRomLine'
 export * from './Line'
 export * from './PositionalAudio'
 export * from './Text'
+export * from './Text3D'
 export * from './Effects'
 export * from './GradientTexture'
 export * from './Image'
@@ -13,6 +15,7 @@ export * from './Trail'
 export * from './Sampler'
 export * from './ComputedAttribute'
 export * from './Clone'
+export * from './MarchingCubes'
 
 // Cameras
 export * from './OrthographicCamera'
@@ -56,6 +59,7 @@ export * from './useAnimations'
 export * from './useFBO'
 export * from './useIntersect'
 export * from './useBoxProjectedEnv'
+export * from './BBAnchor'
 
 // Modifiers
 export * from './CurveModifier'
@@ -89,6 +93,7 @@ export * from './Lightformer'
 export * from './Sky'
 export * from './Stars'
 export * from './Cloud'
+export * from './Sparkles'
 export * from './useMatcapTexture'
 export * from './useNormalTexture'
 
@@ -104,3 +109,5 @@ export * from './AdaptiveDpr'
 export * from './AdaptiveEvents'
 
 // Portals
+export * from './RenderTexture'
+export * from './Mask'

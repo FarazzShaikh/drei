@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { useLoader, useThree, createPortal, useFrame, extend } from '@react-three/fiber'
+import { useLoader, useThree, createPortal, useFrame } from '@react-three/fiber'
 import {
   WebGLCubeRenderTarget,
-  FloatType,
   EquirectangularReflectionMapping,
   CubeTextureLoader,
   Texture,
@@ -12,12 +11,10 @@ import {
   HalfFloatType,
   CubeReflectionMapping,
   BackSide,
-  ShaderMaterial,
-  RGBAFormat,
-  sRGBEncoding,
-  UnsignedByteType,
-  MeshBasicMaterial,
   CubeTexture,
+  sRGBEncoding,
+  LinearEncoding,
+  TextureEncoding,
 } from 'three'
 import { RGBELoader } from 'three-stdlib'
 import { presetsObj, PresetsType } from '../helpers/environment-assets'
@@ -50,7 +47,9 @@ type Props = {
     | {
         radius?: number
         height?: number
+        scale?: number
       }
+  encoding?: TextureEncoding
 }
 
 const isCubeTexture = (def: any): def is CubeTexture => def && (def as CubeTexture).isCubeTexture
@@ -76,10 +75,11 @@ export function EnvironmentMap({ scene, background = false, map }: Props) {
   return null
 }
 
-function useEnvironment({
+export function useEnvironment({
   files = ['/px.png', '/nx.png', '/py.png', '/ny.png', '/pz.png', '/nz.png'],
   path = '',
   preset = undefined,
+  encoding = undefined,
   extensions,
 }: Partial<Props>) {
   if (preset) {
@@ -104,6 +104,7 @@ function useEnvironment({
       loaderResult[0]
     : loaderResult
   texture.mapping = isCubeMap ? CubeReflectionMapping : EquirectangularReflectionMapping
+  texture.encoding = encoding ?? isCubeMap ? sRGBEncoding : LinearEncoding
 
   return texture
 }
@@ -227,6 +228,7 @@ function EnvironmentGround(props: Props) {
 
   const height = (props.ground as any)?.height
   const radius = (props.ground as any)?.radius
+  const scale = (props.ground as any)?.scale ?? 1000
 
   React.useEffect(() => void (height && (mat.current.uniforms.height.value = height)), [height])
   React.useEffect(() => void (radius && (mat.current.uniforms.radius.value = radius)), [radius])
@@ -235,10 +237,10 @@ function EnvironmentGround(props: Props) {
   return (
     <>
       <EnvironmentMap {...props} map={texture} />
-      <Icosahedron args={[1000, 16]}>
+      <Icosahedron scale={scale} args={[1, 16]}>
         <shaderMaterial
           ref={mat}
-          side={BackSide} //
+          side={BackSide}
           vertexShader={vertexShader}
           fragmentShader={fragment}
           uniforms={uniforms}

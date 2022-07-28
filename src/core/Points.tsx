@@ -32,10 +32,6 @@ const PointsInstances = React.forwardRef<THREE.Points, PointsInstancesProps>(
       Float32Array.from({ length: limit }, () => 1),
     ])
 
-    React.useLayoutEffect(() => {
-      parentRef.current.geometry.drawRange.count = Math.min(limit, range !== undefined ? range : limit, refs.length)
-    }, [refs, range])
-
     React.useEffect(() => {
       // We might be a frame too late? 🤷‍♂️
       parentRef.current.geometry.attributes.position.needsUpdate = true
@@ -45,8 +41,12 @@ const PointsInstances = React.forwardRef<THREE.Points, PointsInstancesProps>(
       parentRef.current.updateMatrix()
       parentRef.current.updateMatrixWorld()
       parentMatrix.copy(parentRef.current.matrixWorld).invert()
+
+      parentRef.current.geometry.drawRange.count = Math.min(limit, range !== undefined ? range : limit, refs.length)
+
       for (i = 0; i < refs.length; i++) {
         positionRef = refs[i].current
+        positionRef.getWorldPosition(position).applyMatrix4(parentMatrix)
         position.toArray(positions, i * 3)
         parentRef.current.geometry.attributes.position.needsUpdate = true
         positionRef.matrixWorldNeedsUpdate = true
